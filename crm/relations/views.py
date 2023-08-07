@@ -449,7 +449,7 @@ class DownloadDatabaseExcel(APIView):
 
     def get(self, request):
         # projects sheet
-        projects = Project.objects.all()
+        projects = Project.objects.all().order_by('registration_date')
         projects_list = []
         poc = {"1": "Toplantı Aşaması", "2": "POC Talebi", "3": "POC Aşaması", "4": "POC Gerçekleştirildi", "5": "Yaklaşık Maliyet",
          "6": "Alım Aşaması", "7": "Pazarlık Aşaması", "8": "Gerçekleşti", "9": "Kapandı", "10": "Kaybedildi"}
@@ -496,7 +496,7 @@ class DownloadDatabaseExcel(APIView):
                 }
             )
 
-        clients = Company.objects.filter(role="client")
+        clients = Company.objects.filter(role="client").order_by('name')
         clients_list = []
         for client in clients:
             address = ""
@@ -517,7 +517,7 @@ class DownloadDatabaseExcel(APIView):
                     'Email': mail
                 }
             )
-        partners = Company.objects.filter(role="partner")
+        partners = Company.objects.filter(role="partner").order_by('name')
         partners_list = []
         for partner in partners:
             address = ""
@@ -538,9 +538,35 @@ class DownloadDatabaseExcel(APIView):
                     'Email': mail
                 }
             )
+
+            people = People.objects.all().order_by('first_name', 'last_name')
+            people_list = []
+            for person in people:
+                first_name = ""
+                last_name = ""
+                mail = ""
+                phone = ""
+                company = ""
+
+                if person.email:
+                    mail = person.email
+                if person.phone:
+                    phone = person.phone
+
+                people_list.append(
+                    {
+                        'Ad': person.first_name,
+                        'Soyad': person.last_name,
+                        'Telefon': phone,
+                        'Email': mail,
+                        'Kurum/İş Ortağı': person.company.name
+                    }
+                )
         df = pandas.DataFrame(projects_list)
         clients_df = pandas.DataFrame(clients_list)
         partners_df = pandas.DataFrame(partners_list)
+        people_df = pandas.DataFrame(people_list)
+        print(people_list)
         file_path = '../reports/TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         file_name = 'TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         directory = os.path.dirname(file_path)
@@ -553,9 +579,11 @@ class DownloadDatabaseExcel(APIView):
         df.to_excel(writer, sheet_name='Fırsatlar', index=False, na_rep='NaN')
         clients_df.to_excel(writer, sheet_name='Kurumlar', index=False, na_rep='NaN')
         partners_df.to_excel(writer, sheet_name='İş Ortakları', index=False, na_rep='NaN')
+        people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
         calculate_width(df, 'Fırsatlar', writer)
         calculate_width(clients_df, 'Kurumlar', writer)
         calculate_width(partners_df, 'İş Ortakları', writer)
+        calculate_width(people_df, 'Kişiler', writer)
         writer.close()
         with open(file_path, 'rb') as file:
             response = HttpResponse(FileWrapper(file),
