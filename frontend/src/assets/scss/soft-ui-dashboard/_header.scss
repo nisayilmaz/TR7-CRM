@@ -1,0 +1,43 @@
+.page-header {
+  padding: $page-header-padding;
+  position: $page-header-position;
+  overflow: $page-header-overflow;
+  display: $page-header-display;
+  align-items: $page-header-align-items;
+  background-size: $page-header-bg-size;
+  background-position: $page-header-bg-position;
+
+  .container {
+    z-index: $page-header-conteiner-index;
+  }
+}
+
+.oblique {
+  overflow: visible;
+  width: $header-oblique-img-width;
+  right: $header-oblique-img-right;
+}
+
+.login-img {
+  background-size: 60% !important;
+  left: 0 !important;
+  right: 5vw !important;
+  background-repeat: no-repeat !important;
+  @media (max-width: 1366px ){
+    background-size: 60%;
+    top: 50% ;
+    right: 10vw !important;
+
+
+  }
+  @media (min-width: 1366px ){
+    background-size: 60%;
+    top: 50% ;
+
+  }
+  @media (min-width: 1920px){
+    background-size: 50%;
+    top: 30%;
+  }
+
+}
