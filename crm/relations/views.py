@@ -462,11 +462,11 @@ class DownloadDatabaseExcel(APIView):
             tender_date = ""
             info = ""
             if project.partner_contact:
-                partner_contact = project.partner_contact.first_name + project.partner_contact.last_name
+                partner_contact = project.partner_contact.first_name + " " + project.partner_contact.last_name
             if project.partner:
                 partner = project.partner.name
             if project.client_contact:
-                client_contact = project.client_contact.first_name + project.client_contact.last_name
+                client_contact = project.client_contact.first_name + " " + project.client_contact.last_name
             if project.registration_date:
                 start_date = project.registration_date
             if project.tender_date:
