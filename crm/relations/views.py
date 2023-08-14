@@ -450,127 +450,10 @@ class MailerView(APIView):
 
 class DownloadDatabaseExcel(APIView):
 
-    def get(self, request):
+    def get(self, request, type):
         # projects sheet
-        projects = Project.objects.all().order_by('registration_date')
-        projects_list = []
-        poc = {"1": "Toplantı Aşaması", "2": "POC Talebi", "3": "POC Aşaması", "4": "POC Gerçekleştirildi", "5": "Yaklaşık Maliyet",
-         "6": "Alım Aşaması", "7": "Pazarlık Aşaması", "8": "Gerçekleşti", "9": "Kapandı", "10": "Kaybedildi"}
-        for project in projects:
-            partner = ""
-            partner_contact = ""
-            client_contact = ""
-            start_date = ""
-            end_date = ""
-            tender_date = ""
-            info = ""
-            if project.partner_contact:
-                partner_contact = project.partner_contact.first_name + " " + project.partner_contact.last_name
-            if project.partner:
-                partner = project.partner.name
-            if project.client_contact:
-                client_contact = project.client_contact.first_name + " " + project.client_contact.last_name
-            if project.registration_date:
-                start_date = project.registration_date
-            if project.tender_date:
-                end_date = project.tender_date
-            if project.exp_end_date:
-                tender_date = project.exp_end_date
-            if project.info:
-                info = project.info
+        #type -> 0 all, 1-> projects , 2-> clients, 3-> partners, 4 -> people,
 
-            projects_list.append(
-                {
-                    'Son Kullanıcı': project.client.name,
-                    'İş Ortağı': partner,
-                    'Son Kullanıcı İlgili Kişi': client_contact,
-                    'İş Ortağı İlgili Kişi': partner_contact,
-                    'Account Manager': project.registered_by.first_name + " " + project.registered_by.last_name,
-                    'Ürün': project.product.name,
-                    'Adet': project.count,
-                    'POC': poc.get(project.poc_request),
-                    'Olasılık': project.probability,
-                    'Bütçe': project.budget,
-                    'Fırsat Tarihi': start_date,
-                    'İhale Tarihi': tender_date,
-                    'Tahmini Kapanış Tarihi': end_date,
-                    'Açıklama': info
-
-                }
-            )
-
-        clients = Company.objects.filter(role="client").order_by('name')
-        clients_list = []
-        for client in clients:
-            address = ""
-            phone = ""
-            mail = ""
-
-            if client.address:
-                address = client.address
-            if client.phone:
-                phone = client.phone
-            if client.email:
-                mail = client.email
-            clients_list.append(
-                {
-                    'Son Kullanıcı': client.name,
-                    'Adres': address,
-                    'Telefon': phone,
-                    'Email': mail,
-                    'Account Manager': client.registered_by.first_name + " " + client.registered_by.last_name
-
-                }
-            )
-        partners = Company.objects.filter(role="partner").order_by('name')
-        partners_list = []
-        for partner in partners:
-            address = ""
-            phone = ""
-            mail = ""
-
-            if partner.address:
-                address = partner.address
-            if partner.phone:
-                phone = partner.phone
-            if partner.email:
-                mail = partner.email
-            partners_list.append(
-                {
-                    'Son Kullanıcı': partner.name,
-                    'Adres': address,
-                    'Telefon': phone,
-                    'Email': mail,
-                }
-            )
-
-            people = People.objects.all().order_by('first_name', 'last_name')
-            people_list = []
-            for person in people:
-                first_name = ""
-                last_name = ""
-                mail = ""
-                phone = ""
-                company = ""
-
-                if person.email:
-                    mail = person.email
-                if person.phone:
-                    phone = person.phone
-
-                people_list.append(
-                    {
-                        'Ad': person.first_name,
-                        'Soyad': person.last_name,
-                        'Telefon': phone,
-                        'Email': mail,
-                        'Kurum/İş Ortağı': person.company.name
-                    }
-                )
-        df = pandas.DataFrame(projects_list)
-        clients_df = pandas.DataFrame(clients_list)
-        partners_df = pandas.DataFrame(partners_list)
-        people_df = pandas.DataFrame(people_list)
         file_path = '../reports/TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         file_name = 'TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         directory = os.path.dirname(file_path)
@@ -580,14 +463,139 @@ class DownloadDatabaseExcel(APIView):
             os.makedirs(directory)
 
         writer = pandas.ExcelWriter(file_path)
-        df.to_excel(writer, sheet_name='Fırsatlar', index=False, na_rep='NaN')
-        clients_df.to_excel(writer, sheet_name='Kurumlar', index=False, na_rep='NaN')
-        partners_df.to_excel(writer, sheet_name='İş Ortakları', index=False, na_rep='NaN')
-        people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
-        calculate_width(df, 'Fırsatlar', writer)
-        calculate_width(clients_df, 'Kurumlar', writer)
-        calculate_width(partners_df, 'İş Ortakları', writer)
-        calculate_width(people_df, 'Kişiler', writer)
+        if type == 0 or type == 1:
+            projects = Project.objects.all().order_by('registration_date')
+            projects_list = []
+            poc = {"1": "Toplantı Aşaması", "2": "POC Talebi", "3": "POC Aşaması", "4": "POC Gerçekleştirildi", "5": "Yaklaşık Maliyet",
+             "6": "Alım Aşaması", "7": "Pazarlık Aşaması", "8": "Gerçekleşti", "9": "Kapandı", "10": "Kaybedildi"}
+            for project in projects:
+                partner = ""
+                partner_contact = ""
+                client_contact = ""
+                start_date = ""
+                end_date = ""
+                tender_date = ""
+                info = ""
+                if project.partner_contact:
+                    partner_contact = project.partner_contact.first_name + " " + project.partner_contact.last_name
+                if project.partner:
+                    partner = project.partner.name
+                if project.client_contact:
+                    client_contact = project.client_contact.first_name + " " + project.client_contact.last_name
+                if project.registration_date:
+                    start_date = project.registration_date
+                if project.tender_date:
+                    end_date = project.tender_date
+                if project.exp_end_date:
+                    tender_date = project.exp_end_date
+                if project.info:
+                    info = project.info
+
+                projects_list.append(
+                    {
+                        'Son Kullanıcı': project.client.name,
+                        'İş Ortağı': partner,
+                        'Son Kullanıcı İlgili Kişi': client_contact,
+                        'İş Ortağı İlgili Kişi': partner_contact,
+                        'Account Manager': project.registered_by.first_name + " " + project.registered_by.last_name,
+                        'Ürün': project.product.name,
+                        'Adet': project.count,
+                        'POC': poc.get(project.poc_request),
+                        'Olasılık': project.probability,
+                        'Bütçe': project.budget,
+                        'Fırsat Tarihi': start_date,
+                        'İhale Tarihi': tender_date,
+                        'Tahmini Kapanış Tarihi': end_date,
+                        'Açıklama': info
+
+                    }
+                )
+                df = pandas.DataFrame(projects_list)
+                df.to_excel(writer, sheet_name='Fırsatlar', index=False, na_rep='NaN')
+                calculate_width(df, 'Fırsatlar', writer)
+
+        if type == 0 or type == 2:
+            clients = Company.objects.filter(role="client").order_by('name')
+            clients_list = []
+            for client in clients:
+                address = ""
+                phone = ""
+                mail = ""
+
+                if client.address:
+                    address = client.address
+                if client.phone:
+                    phone = client.phone
+                if client.email:
+                    mail = client.email
+                clients_list.append(
+                    {
+                        'Son Kullanıcı': client.name,
+                        'Adres': address,
+                        'Telefon': phone,
+                        'Email': mail,
+                        'Account Manager': client.registered_by.first_name + " " + client.registered_by.last_name
+
+                    }
+                )
+                clients_df = pandas.DataFrame(clients_list)
+                clients_df.to_excel(writer, sheet_name='Kurumlar', index=False, na_rep='NaN')
+                calculate_width(clients_df, 'Kurumlar', writer)
+
+        if type == 0 or type == 3:
+            partners = Company.objects.filter(role="partner").order_by('name')
+            partners_list = []
+            for partner in partners:
+                address = ""
+                phone = ""
+                mail = ""
+
+                if partner.address:
+                    address = partner.address
+                if partner.phone:
+                    phone = partner.phone
+                if partner.email:
+                    mail = partner.email
+                partners_list.append(
+                    {
+                        'Son Kullanıcı': partner.name,
+                        'Adres': address,
+                        'Telefon': phone,
+                        'Email': mail,
+                    }
+                )
+                partners_df = pandas.DataFrame(partners_list)
+                partners_df.to_excel(writer, sheet_name='İş Ortakları', index=False, na_rep='NaN')
+                calculate_width(partners_df, 'İş Ortakları', writer)
+
+            if type == 0 or type == 4:
+                people = People.objects.all().order_by('first_name', 'last_name')
+                people_list = []
+                for person in people:
+                    first_name = ""
+                    last_name = ""
+                    mail = ""
+                    phone = ""
+                    company = ""
+
+                    if person.email:
+                        mail = person.email
+                    if person.phone:
+                        phone = person.phone
+
+                    people_list.append(
+                        {
+                            'Ad': person.first_name,
+                            'Soyad': person.last_name,
+                            'Telefon': phone,
+                            'Email': mail,
+                            'Kurum/İş Ortağı': person.company.name
+                        }
+                    )
+                    people_df = pandas.DataFrame(people_list)
+                    people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
+                    calculate_width(people_df, 'Kişiler', writer)
+
         writer.close()
         with open(file_path, 'rb') as file:
             response = HttpResponse(FileWrapper(file),

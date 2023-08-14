@@ -17,6 +17,6 @@ urlpatterns = [
     path('download/<int:pk>', download),
     path('mailer/', MailerView.as_view()),
     path('dosyalar/', FilesView.as_view()),
-    path('excel/', DownloadDatabaseExcel.as_view()),
+    path('excel/<int:type>', DownloadDatabaseExcel.as_view()),
 
 ]

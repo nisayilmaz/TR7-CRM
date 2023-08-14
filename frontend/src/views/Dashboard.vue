@@ -259,7 +259,7 @@ export default {
     methods:{
         async downloadSummary() {
             try{
-                const response = await axiosInstance.get("/excel",{
+                const response = await axiosInstance.get("/excel/0",{
                     responseType: 'blob', // Important: Set the response type to 'blob'
 
                 })
