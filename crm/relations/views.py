@@ -202,6 +202,10 @@ class ProjectApiView(APIView):
             'probability': request.data.get('probability'),
             'registered_by': user.id
         }
+        if data.get('registration_date') is None:
+            data['registration_date'] = date.today()
+        print(data)
+
         serializer = ProjectSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
