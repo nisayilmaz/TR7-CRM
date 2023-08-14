@@ -407,7 +407,6 @@ class FinishedProjectApiView(APIView):
                 file_instance.save()
 
             return Response({'status': 'success', 'data': serializer.data}, status=status.HTTP_201_CREATED)
-
         return Response({'status': 'failed', 'data': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -514,7 +513,9 @@ class DownloadDatabaseExcel(APIView):
                     'Son Kullanıcı': client.name,
                     'Adres': address,
                     'Telefon': phone,
-                    'Email': mail
+                    'Email': mail,
+                    'Account Manager': client.registered_by.first_name + " " + client.registered_by.last_name
+
                 }
             )
         partners = Company.objects.filter(role="partner").order_by('name')
@@ -535,7 +536,7 @@ class DownloadDatabaseExcel(APIView):
                     'Son Kullanıcı': partner.name,
                     'Adres': address,
                     'Telefon': phone,
-                    'Email': mail
+                    'Email': mail,
                 }
             )
 
@@ -566,7 +567,6 @@ class DownloadDatabaseExcel(APIView):
         clients_df = pandas.DataFrame(clients_list)
         partners_df = pandas.DataFrame(partners_list)
         people_df = pandas.DataFrame(people_list)
-        print(people_list)
         file_path = '../reports/TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         file_name = 'TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         directory = os.path.dirname(file_path)

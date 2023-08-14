@@ -104,6 +104,25 @@
                     <label for="explanation" class="form-label">Açıklama</label>
                     <input v-model="explanation" type="text" class="ps-0 form-control" id="explanation">
                   </div>
+                    <div v-if="poc === '8' || poc === 8" class="mb-3">
+                        <label for="file" class="form-label">Dosyalar</label>
+                        <input type="file" class="ps-0 form-control" @change="handleFile" id="file" multiple>
+                    </div>
+
+                    <div v-if="poc === '8' || poc === 8" class="mb-3">
+                        <label for="finDate" class="form-label">Bitiş Tarihi*</label>
+                        <input v-model="finDate" type="date" class="ps-0 form-control"  id="finDate">
+                    </div>
+
+                    <div v-if="poc === '8' || poc === 8" class="mb-3">
+                        <label for="invoiceDate" class="form-label">Fatura Tarihi*</label>
+                        <input  v-model="invoiceDate" type="date" class="ps-0 form-control" id="invoiceDate">
+                    </div>
+
+                    <div v-if="poc === '8' || poc === 8" class="mb-3">
+                        <label for="invoiceAmount" class="form-label">Fatura Miktarı*</label>
+                        <input  v-model="invoiceAmount" type="text" class="ps-0 form-control" id="invoiceAmount">
+                    </div>
                 </div>
               </form>
               <button @click="addProject" v-if="response" type="submit" class="btn btn-primary">Ekle</button>
@@ -343,7 +362,10 @@ export default {
       probValues : [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100],
       user:null,
       loading:true,
-      response : true
+      response : true,
+      finDate : null,
+      invoiceDate : null,
+      invoiceAmount : null
     }
   },
   async created() {
@@ -427,9 +449,39 @@ export default {
               budget: this.budget
           });
           let lastId = response.data.data.id;
-          const projectsRes = await axiosInstance.get(`/firsatlar/${lastId}`);
-          this.formatObj(projectsRes.data.data)
-          this.projects.push(projectsRes.data.data);
+          if (this.poc === 8 || this.poc === "8") {
+              const formData = new FormData();
+              if (Array.isArray(this.files) && this.files.length > 0) {
+                  for (let i = 0; i < this.files.length; i++) {
+                      formData.append('files', this.files[i]);
+                  }
+              }else {
+                  formData.append('files', "");
+
+              }
+
+              formData.append('client', this.client);
+              if (this.partner === null) {
+                  formData.append('partner', "");
+
+              }else {
+                  formData.append('partner', this.partner);
+              }
+              formData.append('count', this.count);
+              formData.append('budget', this.budget);
+              formData.append('invoice_date', this.invoiceDate);
+              formData.append('invoice_amount', this.invoiceAmount);
+              formData.append('product', 1);
+              formData.append('end_date', this.finDate);
+              formData.append('project', lastId);
+              formData.append('registered_by', response.data.data.registered_by);
+              let resp = await axiosInstance.post(`/sonlanan/`, formData)
+          }
+          if (!(this.poc === 8 || this.poc === "8" ||this.poc === 9 || this.poc === "9" || this.poc === 10 || this.poc === "10")) {
+              const projectsRes = await axiosInstance.get(`/firsatlar/${lastId}`);
+              this.formatObj(projectsRes.data.data)
+              this.projects.push(projectsRes.data.data);
+          }
           Swal.fire(
               'Fırsat Başarıyla Eklendi',
               '',
