@@ -64,7 +64,7 @@ class Product(models.Model):
 class Project(models.Model):
     client = models.ForeignKey(to=Company, related_name="client", on_delete=models.CASCADE)
     partner = models.ForeignKey(to=Company, related_name="partner", on_delete=models.CASCADE, null=True, blank=True)
-    registration_date = models.DateField()
+    registration_date = models.DateField(auto_now=True)
     exp_end_date = models.DateField(null=True, blank=True)
     tender_date = models.DateField(null=True, blank=True)
     info = models.TextField(null=True, blank=True)
