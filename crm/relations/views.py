@@ -476,6 +476,8 @@ class DownloadDatabaseExcel(APIView):
             file_name = 'TR7_CRM_Is_Ortaklari_Ozet_{}.xlsx'.format(date.today())
         elif download_type == 4:
             file_name = 'TR7_CRM_Kisiler_Ozet_{}.xlsx'.format(date.today())
+        elif download_type == 5:
+            file_name = 'TR7_CRM_Gerceklesen_Firsatlar_Ozet_{}.xlsx'.format(date.today())
 
         file_path = '../reports/{}'.format(file_name)
         directory = os.path.dirname(file_path)
@@ -491,6 +493,7 @@ class DownloadDatabaseExcel(APIView):
             poc = {"1": "Toplantı Aşaması", "2": "POC Talebi", "3": "POC Aşaması", "4": "POC Gerçekleştirildi", "5": "Yaklaşık Maliyet",
              "6": "Alım Aşaması", "7": "Pazarlık Aşaması", "8": "Gerçekleşti", "9": "Kapandı", "10": "Kaybedildi"}
             for project in projects:
+                client = ""
                 partner = ""
                 partner_contact = ""
                 client_contact = ""
@@ -498,10 +501,17 @@ class DownloadDatabaseExcel(APIView):
                 end_date = ""
                 tender_date = ""
                 info = ""
+                product = ""
+                count = ""
+                budget = ""
+                poc_req = ""
+                probability = ""
                 if project.partner_contact:
                     partner_contact = project.partner_contact.first_name + " " + project.partner_contact.last_name
                 if project.partner:
                     partner = project.partner.name
+                if project.client:
+                    partner = project.client.name
                 if project.client_contact:
                     client_contact = project.client_contact.first_name + " " + project.client_contact.last_name
                 if project.registration_date:
@@ -512,19 +522,29 @@ class DownloadDatabaseExcel(APIView):
                     tender_date = project.exp_end_date
                 if project.info:
                     info = project.info
+                if project.product:
+                    product = project.product.name
+                if project.count:
+                    count = project.count
+                if project.poc_request:
+                    poc_req = project.poc_request
+                if project.probability:
+                    probability = project.probability
+                if project.budget:
+                    budget = project.budget
 
                 projects_list.append(
                     {
-                        'Son Kullanıcı': project.client.name,
+                        'Son Kullanıcı': client,
                         'İş Ortağı': partner,
                         'Son Kullanıcı İlgili Kişi': client_contact,
                         'İş Ortağı İlgili Kişi': partner_contact,
                         'Account Manager': project.registered_by.first_name + " " + project.registered_by.last_name,
-                        'Ürün': project.product.name,
-                        'Adet': project.count,
-                        'POC': poc.get(project.poc_request),
-                        'Olasılık': project.probability,
-                        'Bütçe': project.budget,
+                        'Ürün': product,
+                        'Adet': count,
+                        'POC': poc.get(poc_req),
+                        'Olasılık': probability,
+                        'Bütçe': budget,
                         'Fırsat Tarihi': start_date,
                         'İhale Tarihi': tender_date,
                         'Tahmini Kapanış Tarihi': end_date,
@@ -591,7 +611,6 @@ class DownloadDatabaseExcel(APIView):
                 calculate_width(partners_df, 'İş Ortakları', writer)
 
         if download_type == 0 or download_type == 4:
-            print("aaa")
             people = People.objects.all().order_by('first_name', 'last_name')
             people_list = []
             for person in people:
@@ -615,6 +634,30 @@ class DownloadDatabaseExcel(APIView):
                 people_df = pandas.DataFrame(people_list)
                 people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
                 calculate_width(people_df, 'Kişiler', writer)
+
+        if download_type == 0 or download_type == 5:
+            fin_projects = FinishedProject.objects.all()
+            fin_projects_list = []
+            for project in fin_projects:
+                partner = ""
+                if project.partner:
+                    partner = project.partner.name
+                fin_projects_list.append(
+                    {
+                        'Son Kullanıcı': project.client.name,
+                        'İş Ortağı': partner,
+                        'Account Manager': project.registered_by.first_name + " " + project.registered_by.last_name,
+                        'Fatura Tarihi': project.invoice_date,
+                        'Ürün': project.product.name,
+                        'Adet': project.count,
+                        'Bütçe': project.budget,
+                        'Bitiş Tarihi': project.end_date,
+                        'Fatura Miktarı': project.invoice_amount
+                    }
+                )
+                fin_proj_df = pandas.DataFrame(fin_projects_list)
+                fin_proj_df.to_excel(writer, sheet_name='Gerçekleşen Fırsatlar', index=False, na_rep='NaN')
+                calculate_width(fin_proj_df, 'Gerçekleşen Fırsatlar', writer)
 
         writer.close()
         with open(file_path, 'rb') as file:

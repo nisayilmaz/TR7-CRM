@@ -1,8 +1,8 @@
 <template>
   <div class="card mb-4 finished-table" :style="mainStyle">
-    <div class="card-header pb-0">
+    <div class="card-header d-flex justify-content-between pb-0">
       <h6>Gerçekleşen Fırsatlar</h6>
-
+      <vsud-button @click="downloadSummary">Özet İNDİR</vsud-button>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
       <div class="table-responsive p-0">
@@ -144,10 +144,12 @@ import 'vue-slider-component/theme/default.css';
 import VsudProgress from "@/components/VsudProgress.vue";
 import {axiosInstance} from "@/utils/utils";
 import Swal from "sweetalert2";
+import VsudButton from "@/components/VsudButton.vue";
 
 export default {
   name: "FinishedProjectsTable",
   components: {
+      VsudButton,
       VsudProgress,
       VueSlider
   },
@@ -226,7 +228,35 @@ export default {
       }
   },
    methods: {
+       async downloadSummary() {
+           try{
+               const response = await axiosInstance.get(`/excel/5`,{
+                   responseType: 'blob', // Important: Set the response type to 'blob'
 
+               })
+
+               const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+               const url = window.URL.createObjectURL(blob);
+               const link = document.createElement('a');
+               link.href = url;
+
+               let filename = "ozet.xlsx"
+               if (typeof response.headers["content-disposition"] === "string") {
+                   let regex = /filename=([^"]+)/.exec((response.headers["content-disposition"]))
+                   if(regex) {
+                       filename = regex[1]
+                   }
+               }
+               link.setAttribute('download', filename);
+               document.body.appendChild(link);
+               link.click();
+               window.URL.revokeObjectURL(url);
+               document.body.removeChild(link);
+           }catch (error) {
+               console.error('Error downloading the Excel file:', error);
+
+           }
+       },
     formatDate(dateInput, format = 'DD.MM.YYYY') {
       return moment(dateInput).format(format)
     },

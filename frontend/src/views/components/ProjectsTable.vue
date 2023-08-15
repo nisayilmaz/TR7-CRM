@@ -17,7 +17,7 @@
               <form class="row">
                 <div class="col-4">
                   <div class="mb-3">
-                    <label for="client" class="form-label">Son Kullanıcı*</label>
+                    <label for="client" class="form-label">Son Kullanıcı</label>
                     <select v-model="client" class="form-select" id="client" @change="dropdownListener">
                       <option value="null" selected>Kurum Seçin</option>
                       <option v-for="client in clients" :id="client.id" :value="client.id">{{ client.name }}</option>
@@ -35,14 +35,14 @@
                     <input v-model="startDate" type="date" class="ps-0 form-control" id="startDate">
                   </div>
                   <div class="mb-3">
-                    <label for="product" class="form-label">Ürün*</label>
+                    <label for="product" class="form-label">Ürün</label>
                     <select v-model="product" class="form-select" id="product">
                       <option value="null" selected>Ürün Seçin</option>
                       <option v-for="product in products" :key="product.id" :value="product.id"> {{product.name}} </option>
                     </select>
                   </div>
                   <div class="mb-3">
-                    <label for="count" class="form-label">Adet*</label>
+                    <label for="count" class="form-label">Adet</label>
                     <input v-model="count"  type="text" class="ps-0 form-control" id="count">
                   </div>
                 </div>
@@ -65,7 +65,7 @@
                     </select>
                   </div>
                   <div class="mb-3">
-                    <label for="poc" class="form-label">POC*</label>
+                    <label for="poc" class="form-label">POC</label>
                     <select v-model="poc" class="form-select" id="poc">
                       <option value="null" selected>POC Seçin</option>
                       <option value="1"> Toplantı Aşaması </option>
@@ -85,7 +85,7 @@
                     <input v-model="endDate" type="date" class="ps-0 form-control" id="endDate">
                   </div>
                     <div class="mb-3">
-                        <label for="probability" class="form-label">Olasılık*</label>
+                        <label for="probability" class="form-label">Olasılık</label>
                         <vue-slider id="probability"
                                     v-model="probability"
                                     :data="probValues"
@@ -99,7 +99,7 @@
                     <input v-model="tenderDate" type="date" class="ps-0 form-control" id="tenderDate">
                   </div>
                   <div class="mb-3">
-                      <label for="budget" class="form-label">Bütçe*</label>
+                      <label for="budget" class="form-label">Bütçe</label>
                       <input v-model="budget" type="text" class="ps-0 form-control" id="budget">
                   </div>
                   <div class="mb-3">
