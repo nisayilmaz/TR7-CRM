@@ -29,8 +29,7 @@ const routes = [
     }
   },
   {
-    //Todo: Kurumun ingilizcesi?
-    path: "/companies",
+    path: "/organisations",
     name: "Companies",
     component: Companies,
     meta: {
@@ -46,7 +45,6 @@ const routes = [
     }
   },
   {
-    //Todo: firsatın ingilizcesi???
     path: "/opportunities",
     name: "Projects",
     component: Projects,
@@ -55,9 +53,8 @@ const routes = [
     }
   },
   {
-    //Todo: firsatın ingilizcesi???
 
-    path: "/gerceklesen-firsatlar",
+    path: "/finished-opportunities",
     name: "FinishedProjects",
     component: FinishedProjects,
     meta: {
@@ -65,9 +62,8 @@ const routes = [
     }
   },
   {
-    //Todo: firsatın ingilizcesi???
 
-    path: "/kapanan-firsatlar",
+    path: "/closed-opportunities",
     name: "ClosedProjects",
     component: ClosedProjects,
     meta: {
@@ -77,9 +73,8 @@ const routes = [
 
   },
   {
-    //Todo: firsatın ingilizcesi???
 
-    path: "/kaybedilen-firsatlar",
+    path: "/lost-opportunities",
     name: "LostProjects",
     component: LostProjects,
     meta: {
@@ -135,7 +130,7 @@ const routes = [
     name: "PasswordReset",
     component: SignUp,
     meta: {
-      requiresAuth: false // Adjust the meta data as needed for this route
+      requiresAuth: false
     }
   }
 ];
