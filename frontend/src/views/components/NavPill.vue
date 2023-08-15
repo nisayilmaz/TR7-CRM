@@ -30,6 +30,14 @@
           >Yüzyüze Görüşme</a
         >
       </li>
+        <li class="nav-item">
+            <a @click="setFilter(9)"
+               class="nav-link mb-0 px-0 py-1"
+               role="tab"
+               aria-selected="false"
+            >Online Görüşme</a
+            >
+        </li>
       <li class="nav-item">
         <a @click="setFilter(3)"
           class="nav-link mb-0 px-0 py-1"

@@ -37,6 +37,7 @@ NOTES_CATEGORIES = (
     (6, 'Etkinlik'),
     (7, 'İş Yemeği'),
     (8, 'Diğer'),
+    (9, 'Online Görüşme'),
 )
 
 
@@ -79,7 +80,6 @@ class Project(models.Model):
 
 
 class Notes(models.Model):
-    title = models.CharField(max_length=255)
     note = models.TextField()
     creation_date = models.DateField(auto_now=True)
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)

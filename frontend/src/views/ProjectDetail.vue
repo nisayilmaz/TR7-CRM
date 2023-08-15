@@ -28,10 +28,7 @@
                                         <div class="accordion-body">
                                             <form class="row">
                                                 <div class="col-4">
-                                                    <div class="mb-3">
-                                                        <label for="title" class="form-label">Başlık*</label>
-                                                        <input v-model="title" type="text" class="ps-0 form-control" id="title">
-                                                    </div>
+
                                                     <div class="mb-3">
                                                         <label for="note" class="form-label">Not*</label>
                                                         <input v-model="note" type="text" class="ps-0 form-control" id="note">
@@ -41,6 +38,7 @@
                                                         <select v-model="type" class="form-select" id="partner">
                                                             <option value="1">Arama</option>
                                                             <option value="2">Yüzyüze Görüşme</option>
+                                                            <option value="9">Online Görüşme</option>
                                                             <option value="3">İş Ortağı İle Görüşme</option>
                                                             <option value="4">E-posta</option>
                                                             <option value="5">Genel</option>
@@ -61,13 +59,9 @@
                             <ul class="list-group">
                                 <li v-for="note in filteredNotes" :key="note.id" class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
                                     <div class="d-flex flex-column">
-                                        <h6 class="mb-3 text-sm">{{note.title}}</h6>
+                                        <h6 class="mb-3 text-sm">{{formatCategory(note.category)}}</h6>
                                         <span class="mb-2 text-xs">Tarih:
                                             <span class="text-dark font-weight-bold ms-sm-2">{{formatDate(note.creation_date)}}</span>
-                                        </span>
-                                        <span class="mb-2 text-xs">
-                                              Kategori:
-                                              <span class="text-dark ms-sm-2 font-weight-bold">{{formatCategory(note.category)}}</span>
                                         </span>
                                         <span class="text-xs">
                                               Not:
@@ -182,14 +176,13 @@ export default {
             return moment(date).format(format)
         },
         formatCategory(category) {
-            const categories = ["","Arama", "Yüzyüze Görüşme", "İş Ortağı İle Görüşme", "E-posta"]
+            const categories = ["","Arama", "Yüzyüze Görüşme", "İş Ortağı İle Görüşme", "E-posta", "Genel", "Etkinlik", "İş Yemeği", "Diğer", "Online Görüşme"]
             return categories[category]
         },
         async addNote(e) {
             e.preventDefault()
             try {
                 const response = await axiosInstance.post(`/notlar/`, {
-                    title: this.title,
                     note: this.note,
                     project: this.project.id,
                     category: this.type
