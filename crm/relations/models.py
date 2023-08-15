@@ -63,20 +63,20 @@ class Product(models.Model):
 
 
 class Project(models.Model):
-    client = models.ForeignKey(to=Company, related_name="client", on_delete=models.CASCADE)
+    client = models.ForeignKey(to=Company, related_name="client", on_delete=models.CASCADE, null=True, blank=True)
     partner = models.ForeignKey(to=Company, related_name="partner", on_delete=models.CASCADE, null=True, blank=True)
-    registration_date = models.DateField()
+    registration_date = models.DateField(null=True, blank=True)
     exp_end_date = models.DateField(null=True, blank=True)
     tender_date = models.DateField(null=True, blank=True)
     info = models.TextField(null=True, blank=True)
-    count = models.IntegerField()
+    count = models.IntegerField(null=True, blank=True)
     client_contact = models.ForeignKey(to=People, related_name="client_contact", on_delete=models.CASCADE, null=True, blank=True)
     partner_contact = models.ForeignKey(to=People, related_name="partner_contact", on_delete=models.CASCADE, null=True, blank=True)
-    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
-    budget = models.FloatField()
-    poc_request = models.CharField(max_length=1, choices=POC_REQUEST)
-    probability = models.CharField(max_length=3)
-    registered_by = models.ForeignKey(to=CustomUser, on_delete=models.PROTECT)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE, null=True, blank=True)
+    budget = models.FloatField(null=True, blank=True)
+    poc_request = models.CharField(max_length=1, choices=POC_REQUEST, null=True, blank=True)
+    probability = models.CharField(max_length=3, null=True, blank=True)
+    registered_by = models.ForeignKey(to=CustomUser, on_delete=models.PROTECT, null=True, blank=True)
 
 
 class Notes(models.Model):

@@ -4,13 +4,14 @@
       <h6>{{title}}</h6>
       <div class="accordion accordion-flush" id="accordionFlushExample">
         <div class="accordion-item">
-          <h4 class="float-start accordion-header">
+          <div class="d-flex justify-content-between accordion-header">
             <button class="ps-0 accordion-button collapsed " type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
               {{typeName}} Ekle <i class="fa fa-plus ms-2" aria-hidden="true"></i>
             </button>
-          </h4>
-            <vsud-button @click="downloadSummary" class="float-end">Özet İndir</vsud-button>
+              <vsud-button @click="downloadSummary" >Özet İNDİR</vsud-button>
+
+          </div>
 
           <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
             <div class="accordion-body row">

@@ -414,6 +414,16 @@ class FinishedProjectApiView(APIView):
         return Response({'status': 'failed', 'data': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class FinishedProjectDetailView(APIView):
+    def delete(self, request, pk):
+        try:
+            proj = FinishedProject.objects.get(pk=pk)
+            proj.delete()
+            return Response({'status': 'success', 'data': []}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({'status': 'failed', 'data': []}, status=status.HTTP_404_NOT_FOUND)
+
+
 class FilesView(APIView):
     def get(self, request):
         files = FileModel.objects.all()

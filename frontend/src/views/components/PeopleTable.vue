@@ -4,12 +4,13 @@
         <h6>Kişiler</h6>
         <div v-if="company_filter === '0'" class="accordion accordion-flush" id="accordionFlushExample">
           <div class="accordion-item">
-            <h4 class="float-start accordion-header">
-              <button class="ps-0 accordion-button collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#addPeople" aria-expanded="false" aria-controls="flush-collapseOne">
+            <div class="d-flex justify-content-between accordion-header">
+              <button class=" ps-0 accordion-button collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#addPeople" aria-expanded="false" aria-controls="flush-collapseOne">
                   Kişi Ekle <i class="fa fa-plus ms-2" aria-hidden="true"></i>
               </button>
-            </h4>
-              <vsud-button class="float-end" @click="downloadSummary">Özet İndir</vsud-button>
+                <vsud-button  @click="downloadSummary">Özet İNDİR</vsud-button>
+
+            </div>
 
               <div id="addPeople" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
               <div class="accordion-body row">

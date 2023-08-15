@@ -45,6 +45,7 @@
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Dosyalar
                 </th>
+                <th></th>
             </tr>
           </thead>
           <tbody>
@@ -96,6 +97,11 @@
                         </template>
                     </Popper>
                 </td>
+                <td>
+                    <a @click="deleteProject($event ,project)" class="btn btn-link text-danger text-gradient px-3 mb-0" >
+                        <i class="far fa-trash-alt me-2" aria-hidden="true"></i>
+                    </a>
+                </td>
 
 <!--                <td class="align-middle text-center">-->
 <!--                    <span class="text-xs font-weight-bold">-->
@@ -137,6 +143,7 @@ import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css';
 import VsudProgress from "@/components/VsudProgress.vue";
 import {axiosInstance} from "@/utils/utils";
+import Swal from "sweetalert2";
 
 export default {
   name: "FinishedProjectsTable",
@@ -269,6 +276,41 @@ export default {
            }
        }
     },
+       deleteProject(e, project) {
+           e.preventDefault()
+           Swal.fire({
+               title: 'Bu fırsatı silmek istediğinize emin misiniz?',
+               text: "",
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#3085d6',
+               cancelButtonColor: '#d33',
+               confirmButtonText: 'Sil',
+               cancelButtonText:'İptal'
+           }).then(async (result) => {
+               if (result.isConfirmed) {
+                   try {
+                       await axiosInstance.delete(`/sonlanan/${project.id}`, {
+                       });
+                       await axiosInstance.delete(`/firsatlar/${project.project}/`, {
+                       });
+                       this.projects = this.projects.filter(proj => proj.id !== project.id);
+                       Swal.fire(
+                           'Fırsat Başarıyla Silindi',
+                           '',
+                           'success'
+                       )
+                   }
+                   catch (e) {
+                       Swal.fire(
+                           'Hata',
+                           'Fırsat Silinemedi!',
+                           'error'
+                       )
+                   }
+               }
+           })
+       }
   },
   watch: {
     client: {
