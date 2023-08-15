@@ -450,12 +450,24 @@ class MailerView(APIView):
 
 class DownloadDatabaseExcel(APIView):
 
-    def get(self, request, type):
+    def get(self, request, download_type):
+        print(download_type)
+        print(type(download_type))
         # projects sheet
         #type -> 0 all, 1-> projects , 2-> clients, 3-> partners, 4 -> people,
 
-        file_path = '../reports/TR7_CRM_Ozet_{}.xlsx'.format(date.today())
         file_name = 'TR7_CRM_Ozet_{}.xlsx'.format(date.today())
+
+        if download_type == 1:
+            file_name = 'TR7_CRM_Firsatlar_Ozet_{}.xlsx'.format(date.today())
+        elif download_type == 2:
+            file_name = 'TR7_CRM_Kurumlar_Ozet_{}.xlsx'.format(date.today())
+        elif download_type == 3:
+            file_name = 'TR7_CRM_Is_Ortaklari_Ozet_{}.xlsx'.format(date.today())
+        elif download_type == 4:
+            file_name = 'TR7_CRM_Kisiler_Ozet_{}.xlsx'.format(date.today())
+
+        file_path = '../reports/{}'.format(file_name)
         directory = os.path.dirname(file_path)
 
         # Create the directory if it doesn't exist
@@ -463,7 +475,7 @@ class DownloadDatabaseExcel(APIView):
             os.makedirs(directory)
 
         writer = pandas.ExcelWriter(file_path)
-        if type == 0 or type == 1:
+        if download_type == 0 or download_type == 1:
             projects = Project.objects.all().order_by('registration_date')
             projects_list = []
             poc = {"1": "Toplantı Aşaması", "2": "POC Talebi", "3": "POC Aşaması", "4": "POC Gerçekleştirildi", "5": "Yaklaşık Maliyet",
@@ -514,7 +526,7 @@ class DownloadDatabaseExcel(APIView):
                 df.to_excel(writer, sheet_name='Fırsatlar', index=False, na_rep='NaN')
                 calculate_width(df, 'Fırsatlar', writer)
 
-        if type == 0 or type == 2:
+        if download_type == 0 or download_type == 2:
             clients = Company.objects.filter(role="client").order_by('name')
             clients_list = []
             for client in clients:
@@ -542,7 +554,7 @@ class DownloadDatabaseExcel(APIView):
                 clients_df.to_excel(writer, sheet_name='Kurumlar', index=False, na_rep='NaN')
                 calculate_width(clients_df, 'Kurumlar', writer)
 
-        if type == 0 or type == 3:
+        if download_type == 0 or download_type == 3:
             partners = Company.objects.filter(role="partner").order_by('name')
             partners_list = []
             for partner in partners:
@@ -568,33 +580,31 @@ class DownloadDatabaseExcel(APIView):
                 partners_df.to_excel(writer, sheet_name='İş Ortakları', index=False, na_rep='NaN')
                 calculate_width(partners_df, 'İş Ortakları', writer)
 
-            if type == 0 or type == 4:
-                people = People.objects.all().order_by('first_name', 'last_name')
-                people_list = []
-                for person in people:
-                    first_name = ""
-                    last_name = ""
-                    mail = ""
-                    phone = ""
-                    company = ""
+        if download_type == 0 or download_type == 4:
+            print("aaa")
+            people = People.objects.all().order_by('first_name', 'last_name')
+            people_list = []
+            for person in people:
+                mail = ""
+                phone = ""
 
-                    if person.email:
-                        mail = person.email
-                    if person.phone:
-                        phone = person.phone
+                if person.email:
+                    mail = person.email
+                if person.phone:
+                    phone = person.phone
 
-                    people_list.append(
-                        {
-                            'Ad': person.first_name,
-                            'Soyad': person.last_name,
-                            'Telefon': phone,
-                            'Email': mail,
-                            'Kurum/İş Ortağı': person.company.name
-                        }
-                    )
-                    people_df = pandas.DataFrame(people_list)
-                    people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
-                    calculate_width(people_df, 'Kişiler', writer)
+                people_list.append(
+                    {
+                        'Ad': person.first_name,
+                        'Soyad': person.last_name,
+                        'Telefon': phone,
+                        'Email': mail,
+                        'Kurum/İş Ortağı': person.company.name
+                    }
+                )
+                people_df = pandas.DataFrame(people_list)
+                people_df.to_excel(writer, sheet_name='Kişiler', index=False, na_rep='NaN')
+                calculate_width(people_df, 'Kişiler', writer)
 
         writer.close()
         with open(file_path, 'rb') as file:

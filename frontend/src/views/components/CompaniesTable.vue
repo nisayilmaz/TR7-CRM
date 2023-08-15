@@ -4,12 +4,13 @@
       <h6>{{title}}</h6>
       <div class="accordion accordion-flush" id="accordionFlushExample">
         <div class="accordion-item">
-          <h4 class="accordion-header">
+          <h4 class="float-start accordion-header">
             <button class="ps-0 accordion-button collapsed " type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
               {{typeName}} Ekle <i class="fa fa-plus ms-2" aria-hidden="true"></i>
             </button>
           </h4>
+            <vsud-button @click="downloadSummary" class="float-end">Özet İndir</vsud-button>
 
           <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
             <div class="accordion-body row">
@@ -114,10 +115,12 @@ import Swal from "sweetalert2";
 import {axiosInstance} from "@/utils/utils";
 import SearchInput from 'vue-search-input'
 import 'vue-search-input/dist/styles.css'
+import VsudButton from "@/components/VsudButton.vue";
 export default {
 
   name: "CompaniesTable",
   components: {
+      VsudButton,
       SearchInput
   },
   props: {
@@ -235,7 +238,6 @@ export default {
           )
       }
     },
-
     async deleteCompany(e, id) {
       e.preventDefault();
         Swal.fire({
@@ -256,6 +258,42 @@ export default {
             }
         })
     },
+      async downloadSummary() {
+          try{
+              let downloadType
+              if (this.type === 'client'){
+                  downloadType = 2
+              }
+              else if (this.type === 'partner'){
+                  downloadType = 3
+              }
+              const response = await axiosInstance.get(`/excel/${downloadType}`,{
+                  responseType: 'blob', // Important: Set the response type to 'blob'
+
+              })
+
+              const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+
+              let filename = "ozet.xlsx"
+              if (typeof response.headers["content-disposition"] === "string") {
+                  let regex = /filename=([^"]+)/.exec((response.headers["content-disposition"]))
+                  if(regex) {
+                      filename = regex[1]
+                  }
+              }
+              link.setAttribute('download', filename);
+              document.body.appendChild(link);
+              link.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(link);
+          }catch (error) {
+              console.error('Error downloading the Excel file:', error);
+
+          }
+      }
   }
 };
 </script>
