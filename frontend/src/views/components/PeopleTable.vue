@@ -61,7 +61,7 @@
                                v-model:modelValue="search"
                                wrapperClass="search-input-wrapper"
                                :searchIcon="true"
-                               :shortcutIcon="true"
+                               :shortcutIcon="false"
                                :clearIcon="true"
                   />
               </div>

@@ -2,6 +2,7 @@ from datetime import date
 from wsgiref.util import FileWrapper
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Sum, Count, Q
 from django.db.models.functions import TruncMonth, ExtractMonth, Lower
 from django.http import FileResponse, HttpResponse
@@ -204,7 +205,6 @@ class ProjectApiView(APIView):
         }
         if data.get('registration_date') is None:
             data['registration_date'] = date.today()
-        print(data)
 
         serializer = ProjectSerializer(data=data)
         if serializer.is_valid():
@@ -404,7 +404,6 @@ class FinishedProjectApiView(APIView):
         if serializer.is_valid():
             project = serializer.save()
             files = request.FILES.getlist('files')
-
             for file in files:
                 file_instance = FileModel(project=project, file=file)
                 # Save each file instance
@@ -415,13 +414,17 @@ class FinishedProjectApiView(APIView):
 
 
 class FinishedProjectDetailView(APIView):
+    @transaction.atomic
     def delete(self, request, pk):
         try:
-            proj = FinishedProject.objects.get(pk=pk)
-            proj.delete()
+            finished_project = FinishedProject.objects.get(pk=pk)
+            project_id = finished_project.project_id
+            project = Project.objects.get(pk=project_id)
+            project.delete()
+            finished_project.delete()
             return Response({'status': 'success', 'data': []}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
-            return Response({'status': 'failed', 'data': []}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'failed', 'data': []}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FilesView(APIView):
@@ -461,8 +464,6 @@ class MailerView(APIView):
 class DownloadDatabaseExcel(APIView):
 
     def get(self, request, download_type):
-        print(download_type)
-        print(type(download_type))
         # projects sheet
         #type -> 0 all, 1-> projects , 2-> clients, 3-> partners, 4 -> people,
 

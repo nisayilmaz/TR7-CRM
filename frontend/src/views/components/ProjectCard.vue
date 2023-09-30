@@ -97,7 +97,7 @@
                         <label for="accountmngr" class="form-label">Account Manager</label>
                         <select v-model="user" class="form-select" id="partner" @change="dropdownListener">
                             <option selected>Kurum Seçin</option>
-                            <option v-for="user in users" :id="user.id" :value="user.id">{{ user.first_name }}</option>
+                            <option v-for="user in users" :id="user.id" :value="user.id">{{ user.first_name }} {{ user.last_name }}</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -380,7 +380,7 @@ export default {
             try {
                 if (this.poc === 8 || this.poc === "8") {
                     const formData = new FormData();
-                    if (Array.isArray(this.files) && this.files.length > 0) {
+                    if (this.files.length > 0) {
                         for (let i = 0; i < this.files.length; i++) {
                             formData.append('files', this.files[i]);
                         }
@@ -388,7 +388,6 @@ export default {
                         formData.append('files', "");
 
                     }
-
                     formData.append('client', this.client);
                     if (this.partner === null) {
                         formData.append('partner', "");

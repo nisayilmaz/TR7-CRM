@@ -137,6 +137,18 @@
       </div>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
+        <div class="row">
+            <div class="col-3 ms-3">
+                <SearchInput type="search"
+                             v-model:modelValue="search"
+                             wrapperClass="search-input-wrapper"
+                             :searchIcon="true"
+                             :shortcutIcon="false"
+                             :clearIcon="true"
+                />
+            </div>
+
+        </div>
       <div class="table table-striped table-responsive p-0 ">
         <table class="table align-items-center justify-content-center mb-0">
           <thead>
@@ -201,10 +213,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(project, i) in projects" :key="i">
+            <tr v-for="(projectDetail, i) in projectDetails" :key="i">
               <td  class="align-middle ps-4">
-                  <span v-if="projectDetails[i].client" class="text-xs font-weight-bold">
-                    <router-link :to="{ name: 'CompanyDetail', params: { id: projectDetails[i].client.id}}" >{{ projectDetails[i].client?.name }}</router-link>
+                  <span v-if="projectDetail.client" class="text-xs font-weight-bold">
+                    <router-link :to="{ name: 'CompanyDetail', params: { id: projectDetail.client.id}}" >{{ projectDetail.client?.name }}</router-link>
                     </span>
                   <span v-else class="text-xs font-weight-bold">
                       -
@@ -212,64 +224,64 @@
 
               </td>
               <td class="align-middle  ps-4 ">
-                <span v-if="projectDetails[i].partner" class="text-xs font-weight-bold">
-                    <router-link :to="{ name: 'CompanyDetail', params: { id: projectDetails[i].partner.id}}" >{{ projectDetails[i].partner?.name }}</router-link>
+                <span v-if="projectDetail.partner" class="text-xs font-weight-bold">
+                    <router-link :to="{ name: 'CompanyDetail', params: { id: projectDetail.partner.id}}" >{{ projectDetail.partner?.name }}</router-link>
                     </span>
                   <span v-else class="text-xs font-weight-bold">
                       -
                     </span>
               </td>
                 <td class="align-middle  ps-4">
-                    <span  class="text-xs font-weight-bold">{{ projectDetails[i].user?.first_name }} {{ projectDetails[i].user?.last_name }}</span>
+                    <span  class="text-xs font-weight-bold">{{ projectDetail.user?.first_name }} {{ projectDetail.user?.last_name }}</span>
 
                 </td>
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{ project?.registration_date }}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.registration_date }}</span>
               </td>
 
               <td class="align-middle  ps-4 ">
-                <span class="text-xs font-weight-bold">{{ projectDetails[i].product?.name }}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.product?.name }}</span>
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{ project?.count}}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.count}}</span>
 
               </td>
 
               <td class="align-middle  ps-4 ">
-                <span class="text-xs font-weight-bold">{{ project?.budget }}$</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.budget }}$</span>
 
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{ project?.poc_request }}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.poc_request }}</span>
 
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{ project?.exp_end_date }}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.exp_end_date }}</span>
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{projectDetails[i].client_contact?.first_name}} {{ projectDetails[i].client_contact?.last_name}}</span>
+                <span class="text-xs font-weight-bold">{{projectDetail.client_contact?.first_name}} {{ projectDetail.client_contact?.last_name}}</span>
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{projectDetails[i].partner_contact?.first_name}} {{ projectDetails[i].partner_contact?.last_name}}</span>
+                <span class="text-xs font-weight-bold">{{projectDetail.partner_contact?.first_name}} {{ projectDetail.partner_contact?.last_name}}</span>
               </td>
 
               <td class="align-middle   ps-4">
-                <span class="text-xs font-weight-bold">{{ project?.tender_date }}</span>
+                <span class="text-xs font-weight-bold">{{ projectDetail.project?.tender_date }}</span>
               </td>
 
               <td class="align-middle  ps-4">
                 <span class="text-xs font-weight-bold">
                     <Popper :hover="true">
                       <vsud-progress
-                              :percentage="project?.probability"
+                              :percentage="projectDetail.project?.probability"
                       />
                       <template #content>
-                        <div>%{{ project?.probability }}</div>
+                        <div>%{{ projectDetail.project?.probability }}</div>
                       </template>
                     </Popper>
                    </span>
@@ -281,14 +293,14 @@
                     <Popper :hover="true">
                       <i class="far fa-question-circle"></i>
                       <template #content>
-                        <div>{{ project?.info }}</div>
+                        <div>{{ projectDetail.project?.info }}</div>
                       </template>
                     </Popper>
                     </span>
               </td>
                 <td class="align-middle ps-5 ">
                     <span class="text-xs font-weight-bold">
-                        <router-link :to="{ name: 'ProjectDetail', params: { id: project.id} }"><i class="fa fa-external-link"></i></router-link>
+                        <router-link :to="{ name: 'ProjectDetail', params: { id: projectDetail?.project.id} }"><i class="fa fa-external-link"></i></router-link>
                     </span>
                 </td>
             </tr>
@@ -317,19 +329,20 @@
 
 </style>
 <script>
-import axios from "axios";
 import moment from "moment";
 import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css';
 import VsudProgress from "@/components/VsudProgress.vue";
-import {th} from "vuetify/locale";
 import Swal from "sweetalert2";
-import projects from "@/views/Projects.vue";
 import {axiosInstance} from "@/utils/utils";
 import VsudButton from "@/components/VsudButton.vue";
+import SearchInput from "vue-search-input";
+import 'vue-search-input/dist/styles.css'
+
 export default {
   name: "ProjectsTable",
   components: {
+      SearchInput,
       VsudButton,
       VsudProgress,
       VueSlider
@@ -369,7 +382,8 @@ export default {
       response : true,
       finDate : null,
       invoiceDate : null,
-      invoiceAmount : null
+      invoiceAmount : null,
+      search: ""
     }
   },
   async created() {
@@ -429,7 +443,18 @@ export default {
             const product = this.products.find(prod => prod.id === project?.product);
             const user = this.users.find(usr => usr.id === project?.registered_by);
             return { client, partner, client_contact, partner_contact, product, project, user };
-        });
+        }).filter(proj => {
+            return (
+                proj?.client?.name +
+                proj?.partner?.name +
+                proj?.user?.first_name +
+                proj?.user?.last_name +
+                proj?.product?.name +
+                proj?.client_contact?.first_name +
+                proj?.client_contact?.last_name +
+                proj?.partner_contact?.first_name +
+                proj?.partner_contact?.last_name
+            ).toString().toLowerCase().includes(this.search.toLowerCase())});
       }
   },
    methods: {

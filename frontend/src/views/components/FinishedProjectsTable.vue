@@ -5,6 +5,18 @@
       <vsud-button @click="downloadSummary">Özet İNDİR</vsud-button>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
+        <div class="row">
+            <div class="col-3 ms-3">
+                <SearchInput type="search"
+                             v-model:modelValue="search"
+                             wrapperClass="search-input-wrapper"
+                             :searchIcon="true"
+                             :shortcutIcon="false"
+                             :clearIcon="true"
+                />
+            </div>
+
+        </div>
       <div class="table-responsive p-0">
         <table class="table align-items-center justify-content-center mb-0">
           <thead>
@@ -49,51 +61,51 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(project, i) in projects" :key="i">
+            <tr v-for="(projectDetail, i) in projectDetails" :key="i">
               <td  class="align-middle ">
-                <span class="ms-3 text-xs font-weight-bold">{{ projectDetails[i].client?.name }}</span>
+                <span class="ms-3 text-xs font-weight-bold">{{ projectDetail.client?.name }}</span>
 
               </td>
               <td class="align-middle ">
-                <span class="text-xs font-weight-bold ms-3">{{ projectDetails[i].partner?.name }}</span>
+                <span class="text-xs font-weight-bold ms-3">{{ projectDetail.partner?.name }}</span>
 
               </td>
                 <td class="align-middle ">
-                    <span  class="text-xs font-weight-bold ms-3">{{ projectDetails[i].manager?.first_name }} {{ projectDetails[i].manager?.last_name }}</span>
+                    <span  class="text-xs font-weight-bold ms-3">{{ projectDetail.manager?.first_name }} {{ projectDetail.manager?.last_name }}</span>
 
                 </td>
                 <td class="align-middle ">
-                    <span class="text-xs font-weight-bold ms-3">{{ project?.invoice_date }}</span>
+                    <span class="text-xs font-weight-bold ms-3">{{ projectDetail.project?.invoice_date }}</span>
                 </td>
 
               <td class="align-middle ">
-                <span class="text-xs font-weight-bold ms-3">{{ projectDetails[i].product?.name }}</span>
+                <span class="text-xs font-weight-bold ms-3">{{ projectDetail.product?.name }}</span>
               </td>
 
               <td class="align-middle ">
-                <span  class="text-xs font-weight-bold ms-3">{{ project?.count}}</span>
-
-              </td>
-
-              <td class="align-middle ">
-                <span class="text-xs font-weight-bold ms-3">{{ project?.budget }}$</span>
+                <span  class="text-xs font-weight-bold ms-3">{{ projectDetail.project?.count}}</span>
 
               </td>
 
               <td class="align-middle ">
-                <span  class="text-xs font-weight-bold ms-3">{{ project?.end_date }}</span>
+                <span class="text-xs font-weight-bold ms-3">{{ projectDetail.project?.budget }}$</span>
 
               </td>
 
               <td class="align-middle ">
-                <span class="text-xs font-weight-bold ms-3">{{ project?.invoice_amount }}</span>
+                <span  class="text-xs font-weight-bold ms-3">{{ projectDetail.project?.end_date }}</span>
+
+              </td>
+
+              <td class="align-middle ">
+                <span class="text-xs font-weight-bold ms-3">{{ projectDetail.project?.invoice_amount }}</span>
               </td>
 
                 <td class="align-middle ">
                     <Popper class="light">
                         <span class="text-xs font-weight-bold ms-3">Dosyaları Görüntüle</span>
                         <template #content>
-                            <a v-for="file in projectDetails[i]?.projFiles " style="cursor: pointer" @click="download(file.id)" class="text-xs font-weight-bold">{{formatFile(file.file)}}<br></a>
+                            <a v-for="file in projectDetail?.projFiles " style="cursor: pointer" @click="download(file.id)" class="text-xs font-weight-bold">{{formatFile(file.file)}}<br></a>
                         </template>
                     </Popper>
                 </td>
@@ -145,10 +157,12 @@ import VsudProgress from "@/components/VsudProgress.vue";
 import {axiosInstance} from "@/utils/utils";
 import Swal from "sweetalert2";
 import VsudButton from "@/components/VsudButton.vue";
+import SearchInput from "vue-search-input";
 
 export default {
   name: "FinishedProjectsTable",
   components: {
+      SearchInput,
       VsudButton,
       VsudProgress,
       VueSlider
@@ -170,7 +184,8 @@ export default {
       budget: "",
       user:"",
       loading : true,
-      files: null
+      files: null,
+      search : ""
     }
   },
   async created() {
@@ -223,8 +238,15 @@ export default {
                 projFiles = this.files.filter(file => file?.project === project?.id || !project?.id)
 
             }
-            return { client, partner, product, project,manager, projFiles };
-        });
+            return { client, partner, product, project, manager, projFiles};
+        }).filter(proj => {
+            return (
+                proj?.client?.name +
+                proj?.partner?.name +
+                proj?.manager?.first_name +
+                proj?.manager?.last_name +
+                proj?.product?.name
+            ).toString().toLowerCase().includes(this.search.toLowerCase())});
       }
   },
    methods: {
@@ -322,8 +344,7 @@ export default {
                    try {
                        await axiosInstance.delete(`/sonlanan/${project.id}`, {
                        });
-                       await axiosInstance.delete(`/firsatlar/${project.project}/`, {
-                       });
+
                        this.projects = this.projects.filter(proj => proj.id !== project.id);
                        Swal.fire(
                            'Fırsat Başarıyla Silindi',
